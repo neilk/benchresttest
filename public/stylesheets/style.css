@@ -3,6 +3,11 @@ body {
   font: 14px Helvetica, Arial, sans-serif;
 }
 
+/* avoid FOUC */
+#content {
+  display: none;
+}
+
 #totals {
   empty-cells: show;
   border-collapse: collapse;

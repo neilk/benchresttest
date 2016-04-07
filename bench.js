@@ -257,6 +257,7 @@
       if (err) {
         console.error(err);
       } else {
+        $('#figleaf').hide();
         var $totalsTable = $('#totals tbody');
         Object.keys(ledgerTotals).sort().forEach(function(key) {
           console.log("key", key);
@@ -270,6 +271,7 @@
         $('#totals tfoot').append(
           getLedgerRow('TOTAL', ledgerTotals['*'])
         );
+        $('#content').show();
       }
     });
   };
