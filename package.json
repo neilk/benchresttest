@@ -15,5 +15,14 @@
   "bugs": {
     "url": "https://github.com/neilk/benchresttest/issues"
   },
-  "homepage": "https://github.com/neilk/benchresttest#readme"
+  "homepage": "https://github.com/neilk/benchresttest#readme",
+  "dependencies": {
+    "async": "^1.5.2",
+    "node-rest-client": "^1.8.0"
+  },
+  "engines": {
+    "engines": {
+      "node": ">=5.0.0"
+    }
+  }
 }
