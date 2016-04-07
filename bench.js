@@ -267,7 +267,7 @@
             getLedgerRow(key, ledgerTotals[key])
           );
         });
-        $totalsTable.append(
+        $('#totals tfoot').append(
           getLedgerRow('TOTAL', ledgerTotals['*'])
         );
       }

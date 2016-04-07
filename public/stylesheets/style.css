@@ -1,6 +1,35 @@
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 14px Helvetica, Arial, sans-serif;
+}
+
+#totals {
+  empty-cells: show;
+  border-collapse: collapse;
+}
+
+#totals thead td, tbody td {
+  border-bottom: 1px solid #cccccc;
+}
+
+#totals td, #totals th {
+  text-align: left;
+  padding: 0.25em 3em 0.25em 0em;
+  margin: 0em;
+}
+
+#totals th {
+  font-weight: bold;
+  border-bottom: 2px solid black;
+}
+
+#totals tfoot td {
+  font-weight: bold;
+  border-top: 2px solid black;
+}
+
+.revenue {
+  color: #009900;
 }
 
 a {
