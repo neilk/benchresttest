@@ -1,0 +1,19 @@
+{
+  "name": "benchresttest",
+  "version": "1.0.0",
+  "description": "Bench.co candidate test",
+  "main": "bench",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neilk/benchresttest.git"
+  },
+  "author": "Neil Kandalgaonkar <neilk@neilk.net>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/neilk/benchresttest/issues"
+  },
+  "homepage": "https://github.com/neilk/benchresttest#readme"
+}
