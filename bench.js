@@ -2,7 +2,9 @@
   'use strict';
 
   var async = require('async'),
-      Client = require('node-rest-client').Client;
+      Client = require('node-rest-client').Client,
+      equal = require('deep-equal'),
+      sortBy = require('sort-array');
 
   var client = new Client();
   client.registerMethod(
@@ -34,13 +36,16 @@
    */
   var normalizeTransaction = function(tx) {
     return {
+      // TODO doing a Date parse adds time and timezone,
+      // so it implies more accuracy than we actually have.
+      // Should use an object representing Days. Or, leave it
+      // as a string; ISO 8601 dates sort well already?
       date: new Date(tx.Date),
       ledger: tx.Ledger,
       amount: parseInt(tx.Amount, 10),
       company: tx.Company
     };
   };
-
 
   /**
    * Fetch a page of transactions from the API
@@ -67,6 +72,7 @@
       next(err);
     });
   };
+
 
   /**
    * Accumulate all the transactions from the paginated API.
@@ -135,43 +141,41 @@
 
   };
 
+
   /**
-   * Custom sorting function for transactions
-   * @param Object a transaction
-   * @param Object b transaction
-   * @return Number -1, 0, or 1
+   * Remove duplicates from a sorted list of transactions.
+   * Must be sorted by all properties. Assumes no transaction
+   * is undefined.
+   * @param Array transactions sorted
+   * @return Array transactions, still sorted and deduplicated
    */
-  var transactionDateSort = function(a, b) {
-    return function(a, b){
-      if (a.date > b.date) {
-        return -1;
-      } else if (a.date < b.date) {
-        return 1;
-      } else {
-        return 0;
+  var deduplicateTransactions = function(transactions) {
+    var deduplicated = [];
+    var current;
+    transactions.forEach(function(tx) {
+      if (!equal(tx, current)) {
+        deduplicated.push(tx);
+        current = tx;
       }
-    };
+    });
+    return deduplicated;
   };
+
 
   /**
    * Given an array of normalized transactions, calculate the current
-   * total balance. Note that transactions may be out of order.
-   * Synchronous.
+   * total balance.
    *
    * @param Array transactions
    * @return Number total balance
    */
   var calculateTotalBalance = function(transactions) {
     var totalBalance = 0;
-    // this isn't strictly necessary for total balance calculation.
-    // but will be for running balance
-    transactions.sort(transactionDateSort);
     transactions.forEach(function(tx) {
       totalBalance += tx.amount;
     });
     return totalBalance;
   };
-
 
   /**
    * Fetch transactions, obtain total balance
@@ -183,6 +187,11 @@
         next(err);
       } else {
         try {
+          // sorting helps deduplicate, and will also help us with
+          // running totals
+          transactions = sortBy(transactions,
+                                ['date', 'ledger', 'company', 'amount']);
+          transactions = deduplicateTransactions(transactions);
           next(null, calculateTotalBalance(transactions));
         } catch(e) {
           next(e);
@@ -190,7 +199,6 @@
       }
     });
   };
-
 
   /**
    * Main entry point
@@ -202,7 +210,6 @@
       console.log("total balance", totalBalance);
     }
   });
-
 
 
 }());
