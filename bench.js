@@ -146,6 +146,10 @@
    * Remove duplicates from a sorted list of transactions.
    * Must be sorted by all properties. Assumes no transaction
    * is undefined.
+   * TODO: In a real world application, we wouldn't remove transactions
+   * just because they were similar, because transactions could be
+   * legitimately the same, especially within a single day. We'd have to
+   * flag them as *possible* transactions instead, for human review.
    * @param Array transactions sorted
    * @return Array transactions, still sorted and deduplicated
    */
@@ -163,25 +167,30 @@
 
 
   /**
-   * Given an array of normalized transactions, calculate the current
-   * total balance.
+   * Given an array of normalized transactions, calculate the total balances
+   * and the balances per ledger.
    *
-   * @param Array transactions
+   * @param Array transactions sorted
    * @return Number total balance
    */
-  var calculateTotalBalance = function(transactions) {
-    var totalBalance = 0;
+  var calculateLedgerTotals = function(transactions) {
+    // The asterisk represents all transactions
+    var ledgerTotals = { '*': 0 };
     transactions.forEach(function(tx) {
-      totalBalance += tx.amount;
+      ledgerTotals['*'] += tx.amount;
+      if (!(tx.ledger in ledgerTotals)) {
+        ledgerTotals[tx.ledger] = 0;
+      }
+      ledgerTotals[tx.ledger] += tx.amount;
     });
-    return totalBalance;
+    return ledgerTotals;
   };
 
   /**
    * Fetch transactions, obtain total balance
-   * @param Function next node-style callback taking total balance
+   * @param Function next node-style callback taking object of ledger totals
    */
-  var getTotalBalance = function(next) {
+  var getLedgerTotals = function(next) {
     getTransactions(function(err, transactions) {
       if (err) {
         next(err);
@@ -192,7 +201,7 @@
           transactions = sortBy(transactions,
                                 ['date', 'ledger', 'company', 'amount']);
           transactions = deduplicateTransactions(transactions);
-          next(null, calculateTotalBalance(transactions));
+          next(null, calculateLedgerTotals(transactions));
         } catch(e) {
           next(e);
         }
@@ -203,11 +212,11 @@
   /**
    * Main entry point
    */
-  getTotalBalance(function(err, totalBalance) {
+  getLedgerTotals(function(err, ledgerTotals) {
     if (err) {
       console.error(err);
     } else {
-      console.log("total balance", totalBalance);
+      console.log("ledger totals", ledgerTotals);
     }
   });
 
