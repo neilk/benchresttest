@@ -1,10 +1,13 @@
 (function() {
   'use strict';
 
-  var async = require('async'),
+  var $ = require('jquery-browserify'),
+      async = require('async'),
       Client = require('node-rest-client').Client,
+      domready = require('domready'),
       equal = require('deep-equal'),
-      sortBy = require('sort-array');
+      sortBy = require('sort-array'),
+      sprintf = require("sprintf-js").sprintf;
 
   var client = new Client();
   client.registerMethod(
@@ -165,6 +168,14 @@
     return deduplicated;
   };
 
+  /**
+   * Helper function, determine if empty or contains whitespace
+   * @param String s
+   * @return Boolean
+   */
+  var isBlank = function(s) {
+    return (typeof(s) === 'undefined') || (s.trim() === '');
+  };
 
   /**
    * Given an array of normalized transactions, calculate the total balances
@@ -175,13 +186,17 @@
    */
   var calculateLedgerTotals = function(transactions) {
     // The asterisk represents all transactions
-    var ledgerTotals = { '*': 0 };
+    var ledgerTotals = {'*': 0};
     transactions.forEach(function(tx) {
       ledgerTotals['*'] += tx.amount;
-      if (!(tx.ledger in ledgerTotals)) {
-        ledgerTotals[tx.ledger] = 0;
+      var ledger = tx.ledger;
+      if (isBlank(ledger)) {
+        ledger = 'Unknown'; // or, revenue?
       }
-      ledgerTotals[tx.ledger] += tx.amount;
+      if (!(ledger in ledgerTotals)) {
+        ledgerTotals[ledger] = 0;
+      }
+      ledgerTotals[ledger] += tx.amount;
     });
     return ledgerTotals;
   };
@@ -209,16 +224,59 @@
     });
   };
 
+
+  /**
+   * Create a row for the ledger. Puts expenses and revenue into own columns
+   * @param String ledger
+   * @param Number amount
+   * @return jQuery row
+   */
+  var getLedgerRow = function(ledger, amount) {
+    var revenue = '';
+    var expense = '';
+    if (amount < 0) {
+      expense = sprintf('%01.2f', -1 * amount);
+    } else {
+      revenue = sprintf('%01.2f', amount);
+    }
+    console.log(ledger, expense, revenue);
+    var $row = $('<tr>').append(
+      $('<td>').addClass('ledger').append(ledger),
+      $('<td>').addClass('expense').append(expense),
+      $('<td>').addClass('revenue').append(revenue)
+    );
+    console.log($row);
+    return $row;
+  };
+
   /**
    * Main entry point
    */
-  getLedgerTotals(function(err, ledgerTotals) {
-    if (err) {
-      console.error(err);
-    } else {
-      console.log("ledger totals", ledgerTotals);
-    }
-  });
+  var main = function() {
+    getLedgerTotals(function(err, ledgerTotals) {
+      if (err) {
+        console.error(err);
+      } else {
+        var $totalsTable = $('#totals tbody');
+        Object.keys(ledgerTotals).sort().forEach(function(key) {
+          console.log("key", key);
+          if (key === '*') {
+            return;
+          }
+          $totalsTable.append(
+            getLedgerRow(key, ledgerTotals[key])
+          );
+        });
+        $totalsTable.append(
+          getLedgerRow('TOTAL', ledgerTotals['*'])
+        );
+      }
+    });
+  };
 
+  /**
+   * When document ready, start the fun!
+   */
+  domready(main);
 
 }());

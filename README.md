@@ -2,7 +2,7 @@
 
 A (hurried) implementation of the [Bench.co REST test](http://resttest.bench.co/).
 
-The app is a simple [Node.js](https://nodejs.org/) console application. You must 
+The app is a simple [Express.js](https://expressjs.com/) web application. You must 
 have Node and npm installed, with a version larger than `0.10` or so. 
 
 To install, type the following commands at a shell prompt:
@@ -11,16 +11,16 @@ To install, type the following commands at a shell prompt:
     $ git clone git@github.com:neilk/benchresttest.git
     $ cd benchresttest
     $ npm install
-    $ node bench.js
+    $ npm run build-js
+    $ npm start
 ```
 
+Then check out [http://localhost:3000/](http://localhost:3000/) in your web browser.
+
 The app will fetch pages from the REST API, deduplicate transactions, and present 
-totals for all ledgers and each ledger. The output is in JSON on the console.
+totals for all ledgers and each ledger as a web page.
 
 ## Notes
-
-Many of the extra-credit stories seemed to imply a more interactive app, like a web
-page. I didn't have time to do that, but I used Node to make it possible later.
 
 Regrettably, there are no tests, although I try to write in a side-effects-free style
 to facilitate them.
