@@ -17,10 +17,24 @@ body {
   border-bottom: 1px solid #cccccc;
 }
 
-#totals td, #totals th {
+#totals td.ledger, #totals th.ledger {
   text-align: left;
+}
+
+#totals th.revenue, #totals th.expense, 
+#totals td.revenue, #totals td.expense {
+  /* technically should be decimal alignment but 
+   * most browsers do not support it */
+  text-align: right;
+}
+
+#totals td, #totals th {
   padding: 0.25em 3em 0.25em 0em;
   margin: 0em;
+}
+
+#totals td.revenue, #totals th.revenue {
+  padding-right: 0em;
 }
 
 #totals th {
@@ -33,8 +47,13 @@ body {
   border-top: 2px solid black;
 }
 
-.revenue {
+#totals td.revenue {
   color: #009900;
+}
+
+#balance {
+  font-weight: bold;
+  font-size: larger;
 }
 
 a {

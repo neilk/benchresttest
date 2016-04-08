@@ -224,30 +224,34 @@
     });
   };
 
+  /**
+   * Helper function, formats numbers as currency. Returns
+   * empty string if n == 0makes both table rows and the totals row
+   * @param Number n
+   * @return String currency-formatted number
+   */
+  var formatCurrency = function(n) {
+    if (n !== 0) {
+      return sprintf('%01.2f', n);
+    } else {
+      return '';
+    }
+  };
 
   /**
-   * Create a row for the ledger. Puts expenses and revenue into own columns
-   * @param String ledger
-   * @param Number amount
+   * Helper function, makes both table rows and the totals row
+   * @param String ledger name column
+   * @param Number expense expense column
+   * @param Number revenue revenue column
    * @return jQuery row
    */
-  var getLedgerRow = function(ledger, amount) {
-    var revenue = '';
-    var expense = '';
-    if (amount < 0) {
-      expense = sprintf('%01.2f', -1 * amount);
-    } else {
-      revenue = sprintf('%01.2f', amount);
-    }
-    console.log(ledger, expense, revenue);
-    var $row = $('<tr>').append(
+  var getTableRow = function(ledger, expense, revenue) {
+    return $('<tr>').append(
       $('<td>').addClass('ledger').append(ledger),
-      $('<td>').addClass('expense').append(expense),
-      $('<td>').addClass('revenue').append(revenue)
+      $('<td>').addClass('expense').append(formatCurrency(expense)),
+      $('<td>').addClass('revenue').append(formatCurrency(revenue))
     );
-    console.log($row);
-    return $row;
-  };
+  }
 
   /**
    * Main entry point
@@ -257,6 +261,8 @@
       if (err) {
         console.error(err);
       } else {
+        var totalRevenue = 0;
+        var totalExpense = 0;
         $('#figleaf').hide();
         var $totalsTable = $('#totals tbody');
         Object.keys(ledgerTotals).sort().forEach(function(key) {
@@ -264,13 +270,26 @@
           if (key === '*') {
             return;
           }
+          var amount = ledgerTotals[key];
+          var revenue = 0;
+          var expense = 0;
+          if (amount < 0) {
+            expense = -1 * amount;
+          } else {
+            revenue = amount;
+          }
+          totalRevenue += revenue;
+          totalExpense += expense;
           $totalsTable.append(
-            getLedgerRow(key, ledgerTotals[key])
+            getTableRow(key, expense, revenue)
           );
         });
         $('#totals tfoot').append(
-          getLedgerRow('TOTAL', ledgerTotals['*'])
+          getTableRow('TOTAL', totalExpense, totalRevenue)
         );
+        $('#balance').append(
+          'Total balance: ' + formatCurrency(ledgerTotals['*'])
+        )
         $('#content').show();
       }
     });
