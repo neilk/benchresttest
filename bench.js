@@ -255,6 +255,7 @@
 
   /**
    * Main entry point
+   * TODO: This is mixing calculation and presentation a little bit.
    */
   var main = function() {
     getLedgerTotals(function(err, ledgerTotals) {
