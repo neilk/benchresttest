@@ -8,7 +8,7 @@ have Node and npm installed, with a version larger than `0.10` or so.
 To install, type the following commands at a shell prompt:
 
 ```
-    $ git clone git@github.com:neilk/benchresttest.git
+    $ git clone https://github.com/neilk/benchresttest.git
     $ cd benchresttest
     $ npm install
     $ npm run build-js
